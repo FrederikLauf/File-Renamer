@@ -12,14 +12,16 @@ import os
 class FileRenamer:
 
     def __init__(self):
-        self._path = r'C:\Users\Frederik\Desktop\Bilder'
+        self._path = r'C:\Users\Frederik\Pictures\Fremde\Heidelberg'
 
     def _make_list_of_files(self):
 
+        folder_list = [folder.path for folder in os.scandir(self._path)]
         file_list = []
-
-        for folder in os.scandir(self._path):
-            if os.path.isdir(folder.path):
-                for file in os.scandir(folder.path):
-                    file_list.append(file.path)
+        for folder in sorted(folder_list):
+            if os.path.isdir(folder):
+                folder_files = [file.path for file in os.scandir(folder)]
+                for file in sorted(folder_files):
+                    # ToDo: filter for valid file types
+                    file_list.append(file)
         return file_list
