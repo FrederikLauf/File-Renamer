@@ -13,6 +13,7 @@ class FileRenamer:
 
     def __init__(self):
         self._path = r'C:\Users\Frederik\Pictures\Fremde\Heidelberg'
+        self._valid_types = ['jpg', 'JPG', 'AVI', 'avi', 'mp4']
 
     def _make_list_of_files(self):
 
@@ -22,5 +23,6 @@ class FileRenamer:
             if os.path.isdir(folder):
                 folder_files = [file.path for file in os.scandir(folder)]
                 for file in sorted(folder_files):
-                    file_list.append(file)
+                    if file.split('.')[-1] in self._valid_types:
+                        file_list.append(file)
         return file_list
