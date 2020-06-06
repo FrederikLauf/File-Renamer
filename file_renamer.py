@@ -22,6 +22,5 @@ class FileRenamer:
             if os.path.isdir(folder):
                 folder_files = [file.path for file in os.scandir(folder)]
                 for file in sorted(folder_files):
-                    # ToDo: filter for valid file types
                     file_list.append(file)
         return file_list
