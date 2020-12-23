@@ -8,6 +8,8 @@ class FileRenamerGUI:
 
     def __init__(self, window):
         self.fr = FileRenamer()
+        self._sortchoice_var = tk.IntVar()
+        self._writechoice_var = tk.IntVar()
         # define window
         self._window = window
         self._window.title('File Renamer')
@@ -23,15 +25,21 @@ class FileRenamerGUI:
         self._scrollbar_old = tk.Scrollbar(window)
         self._filebox_old = tk.Listbox(window, yscrollcommand=self._scrollbar_old.set)
         self._scrollbar_old.config(command=self._filebox_old.yview)
-        self._radio_namesort = tk.Radiobutton(window, text='sort by name')
-        self._radio_datesort = tk.Radiobutton(window, text='sort by date')
+        self._radio_namesort = tk.Radiobutton(window, text='sort by name',
+                                              variable=self._sortchoice_var,
+                                              value=1, command=self._choose_sorting)
+        self._radio_namesort.select()
+        self._radio_datesort = tk.Radiobutton(window, text='sort by date',
+                                              variable=self._sortchoice_var,
+                                              value=2, command=self._choose_sorting)
         # right area
         self._preview_label = tk.Label(window, text='Preview')
         self._scrollbar_new = tk.Scrollbar(window)
         self._filebox_new = tk.Listbox(window, yscrollcommand=self._scrollbar_new.set)
         self._scrollbar_new.config(command=self._filebox_new.yview)
-        self._radio_override = tk.Radiobutton(window, text='override')
-        self._radio_copy = tk.Radiobutton(window, text='make copy')
+        self._radio_override = tk.Radiobutton(window, text='override', variable=self._writechoice_var, value=1)
+        self._radio_override.select()
+        self._radio_copy = tk.Radiobutton(window, text='make copy', variable=self._writechoice_var, value=2)
         # middle area
         self._format_label = tk.Label(window, text='Format')
         self._prefix_label = tk.Label(window, text='Prefix:')
@@ -52,17 +60,21 @@ class FileRenamerGUI:
         self._originals_label.place(x=10, y=50, width=220, height=50)
         self._scrollbar_old.place(x=210, y=110, height=310)
         self._filebox_old.place(x=10, y=110, width=200, height=310)
-        self._radio_datesort.config(bg='black', activebackground='black', fg='white', relief=tk.RAISED)
-        self._radio_namesort.config(bg='black', activebackground='black', fg='white', relief=tk.RAISED)
-        self._radio_datesort.place(x=10, y=430, width=110, height=30)
-        self._radio_namesort.place(x=120, y=430, width=110, height=30)
+        self._radio_datesort.config(bg='black', activebackground='black',
+                                    fg='white', selectcolor='black', relief=tk.RAISED)
+        self._radio_namesort.config(bg='black', activebackground='black',
+                                    fg='white', selectcolor='black', relief=tk.RAISED)
+        self._radio_namesort.place(x=10, y=430, width=110, height=30)
+        self._radio_datesort.place(x=120, y=430, width=110, height=30)
         # right area
         self._preview_label.config(font='Helvetica 12 bold', bg='grey', activebackground='grey')
         self._preview_label.place(x=570, y=50, width=220, height=50)
         self._scrollbar_new.place(x=770, y=110, height=310)
         self._filebox_new.place(x=570, y=110, width=200, height=310)
-        self._radio_override.config(bg='black', activebackground='black', fg='white', relief=tk.RAISED)
-        self._radio_copy.config(bg='black', activebackground='black', fg='white', relief=tk.RAISED)
+        self._radio_override.config(bg='black', activebackground='black',
+                                    fg='white', selectcolor='black', relief=tk.RAISED)
+        self._radio_copy.config(bg='black', activebackground='black',
+                                fg='white', selectcolor='black', relief=tk.RAISED)
         self._radio_override.place(x=570, y=430, width=110, height=30)
         self._radio_copy.place(x=680, y=430, width=110, height=30)
         # middle area
@@ -86,18 +98,44 @@ class FileRenamerGUI:
         self._browse_button.place(x=10, y=10, width=780, height=30)
         self._apply_button.place(x=10, y=470, width=780, height=30)
 
+    # -------methods invoked by GUI actions------------------------------------
+
     def _browse_folder(self):
+        """
+        Let user select a folder and display file content in list box.
+        """
         path = filedialog.askdirectory()
         if path:
-            self.fr._path = path
+            self.fr._basepath = path
             self._browse_button.config(text=path)
-            file_list = os.listdir(path)
-            self._filebox_old.delete(0, tk.END)
-            for item in file_list:
-                self._filebox_old.insert(tk.END, item)
+            self.fr._file_list = self.fr._make_list_of_files()
+            self._show_originals()
+
+    def _choose_sorting(self):
+        """
+        Sort internal file list according to choice and update display.
+        """
+        if self._sortchoice_var == 1:
+            # call sorting method
+            pass
+        else:
+            # call sorting method
+            pass
+        self._show_originals()
+
+    def _show_originals(self):
+        """
+        Show or update list of original file names with dates in list box.
+        """
+        print("Updating")
+        split = os.path.split
+        file_list = [(split(e[0])[-1], e[1]) for e in self.fr._file_list]
+        self._filebox_old.delete(0, tk.END)
+        for item in file_list:
+            self._filebox_old.insert(tk.END, item)
 
 
 if __name__ == "__main__":
     root = tk.Tk()
-    fr = FileRenamerGUI(root)
+    frg = FileRenamerGUI(root)
     root.mainloop()
