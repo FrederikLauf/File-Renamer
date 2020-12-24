@@ -16,7 +16,8 @@ class FileRenamer:
         self._basepath = None
         self._image_types = ['jpg', 'JPG', 'png', 'PNG']
         self._file_list = []
-        self._prefix = ''
+        self._namepattern = {"prefix": "", "digits": "1", "startnum": "1"}
+
 
     def _only_folders(self):
         for item in os.scandir(self._basepath):

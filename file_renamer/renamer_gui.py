@@ -1,21 +1,28 @@
 import tkinter as tk
 from tkinter import filedialog
 import os
+import re
 from file_renamer import FileRenamer
 
 
 class FileRenamerGUI:
 
     def __init__(self, window):
+
+        self._window = window
         self.fr = FileRenamer()
+        # entry and selection states
         self._sortchoice_var = tk.IntVar()
         self._writechoice_var = tk.IntVar()
-        # define window
-        self._window = window
-        self._window.title('File Renamer')
-        self._window.config(bg='black')
-        self._window.attributes("-alpha", 0.85)
-        self._window.geometry('800x510')
+        self._startnumber_var = tk.StringVar()
+        self._startnumber_var.set(self.fr._namepattern["startnum"])
+        self._startnumber_var.trace("w", self._set_startnumber)
+        self._prefix_var = tk.StringVar()
+        self._prefix_var.set(self.fr._namepattern["prefix"])
+        self._prefix_var.trace("w", self._set_prefix)
+        self._digits_var = tk.StringVar()
+        self._digits_var.set(self.fr._namepattern["digits"])
+        self._digits_var.trace("w", self._set_digits)
         # define elements on window
         # top and bottom
         self._browse_button = tk.Button(window, text='Browse', command=self._browse_folder)
@@ -43,11 +50,12 @@ class FileRenamerGUI:
         # middle area
         self._format_label = tk.Label(window, text='Format')
         self._prefix_label = tk.Label(window, text='Prefix:')
-        self._prefix_entry = tk.Entry(window)
+        self._prefix_entry = tk.Entry(window, textvariable=self._prefix_var)
         self._startnumber_label = tk.Label(window, text='Start with:')
-        self._startnumber_entry = tk.Entry(window)
+        self._startnumber_entry = tk.Entry(window, textvariable=self._startnumber_var)
         self._digitnumber_label = tk.Label(window, text='Digits:')
-        self._digitnumber_spinbox = tk.Spinbox(window, from_=1, to=10)
+        self._digitnumber_spinbox = tk.Spinbox(window, from_=self.fr._namepattern["digits"], to=9,
+                                               textvariable=self._digits_var)
         # configure style and place elements on window
         self._make_layout()
 
@@ -55,6 +63,10 @@ class FileRenamerGUI:
         """
         Configure style and place elements on window.
         """
+        self._window.title('File Renamer')
+        self._window.config(bg='black')
+        self._window.attributes("-alpha", 0.85)
+        self._window.geometry('800x510')
         # left area
         self._originals_label.config(font='Helvetica 12 bold', bg='grey', activebackground='grey')
         self._originals_label.place(x=10, y=50, width=220, height=50)
@@ -109,17 +121,28 @@ class FileRenamerGUI:
             self.fr._basepath = path
             self._browse_button.config(text=path)
             self.fr._file_list = self.fr._make_list_of_files()
+            digits = len(str(len(self.fr._file_list)))
+            self.fr._namepattern["digits"] = digits
+            self._digits_var.set(digits)
+            self._digitnumber_spinbox.config(from_=digits)
             self._show_originals()
+
+    def _set_default_prefix(self):
+        """
+        Extract and set common prefix from original files if possible, else
+        empty string.
+        """
+        pass
 
     def _choose_sorting(self):
         """
         Sort internal file list according to choice and update display.
         """
         if self._sortchoice_var == 1:
-            # call sorting method
+            # ToDo: call sorting method, to be implemented
             pass
         else:
-            # call sorting method
+            # ToDo: call sorting method, to be implemented
             pass
         self._show_originals()
 
@@ -133,6 +156,41 @@ class FileRenamerGUI:
         self._filebox_old.delete(0, tk.END)
         for item in file_list:
             self._filebox_old.insert(tk.END, item)
+
+    def _set_startnumber(self, *args):
+        current_entry = self._startnumber_var.get()
+        if re.match(r"^\d+$", current_entry):
+            start = str(int(current_entry))
+            max_num = int(current_entry) + len(self.fr._file_list)
+            min_digits = len(str(max_num))
+        elif current_entry == "":
+            start = "1"
+            min_digits = len(str(len(self.fr._file_list)))
+        else:
+            start = "1"
+            self._startnumber_var.set("1")
+            min_digits = len(str(len(self.fr._file_list)))
+        self.fr._namepattern["startnum"] = start
+        self._digitnumber_spinbox.config(from_=min_digits)
+        self._digits_var.set(str(min_digits))
+        print(self.fr._namepattern)
+
+    def _set_prefix(self, *args):
+        self.fr._namepattern["prefix"] = self._prefix_var.get()
+        print(self.fr._namepattern)
+
+    def _set_digits(self, *args):
+        digits = self._digits_var.get()
+        max_num = int(self.fr._namepattern["startnum"]) + len(self.fr._file_list)
+        min_digits = len(str(max_num))
+        if re.match(r"^\d+$", digits) and int(digits) >= min_digits:
+            digits = str(int(digits))
+        else:
+            digits = str(min_digits)
+            self._digits_var.set(digits)
+            self._digitnumber_spinbox.config(from_=min_digits)
+        self.fr._namepattern["digits"] = digits
+        print(self.fr._namepattern)
 
 
 if __name__ == "__main__":
