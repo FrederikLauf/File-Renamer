@@ -8,6 +8,7 @@ Created on Wed Jun  3 21:38:10 2020
 import os
 from PIL import Image, ExifTags
 import logging
+import re
 
 
 class FileRenamer:
@@ -17,7 +18,8 @@ class FileRenamer:
         self._image_types = ['jpg', 'JPG', 'png', 'PNG']
         self._file_list = []
         self._namepattern = {"prefix": "", "digits": "1", "startnum": "1"}
-
+        logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO)
+        self.logger = logging.getLogger("FileRenamer")
 
     def _only_folders(self):
         for item in os.scandir(self._basepath):
@@ -25,8 +27,9 @@ class FileRenamer:
                 return False
         return True
 
-    def _make_pre_zeros(self, idx):
-        zeros = (len(str(len(self._file_list))) - len(str(idx))) * '0'
+    @staticmethod
+    def _make_pre_zeros(digits, idx):
+        zeros = (digits - len(str(idx))) * '0'
         return zeros
 
     # @staticmethod
@@ -38,6 +41,12 @@ class FileRenamer:
     #             day, time = exif_data[k].split(' ')
     #             day = '.'.join(reversed(day.split(':')))
     #             return day, time
+
+    def _get_default_prefix(self):
+        file_names = [item[0] for item in self._file_list]
+        prefices = [re.search(r"(\D+).*\.\w+", item) for item in file_names]
+        candidates = set(item.group(1) for item in prefices if item is not None)
+        return candidates.pop() if len(candidates) == 1 else ""
 
     @staticmethod
     def _get_exif_date(image_path):
@@ -64,27 +73,24 @@ class FileRenamer:
         file_list = []
         for file in os.scandir(self._basepath):
             file_path = file.path
+            file_name = os.path.split(file_path)[-1]
             if os.path.isfile(file_path):
-                file_name, suffix = file_path.split('.')[-2:]
+                suffix = file_name.split('.')[-1]
                 if suffix in self._image_types:
                     date = self._get_exif_date(file_path)
                     if date is None:
                         date = self._get_modified_date(file_path)
                 else:
                     date = self._get_modified_date(file_path)
-                file_list.append((file_path, date))
+                file_list.append((file_name, date))
         return file_list
-    
+
     def _sort_by_date(self):
-        #file_list = self._make_list_of_files()
-        self._file_list.sort(key = lambda item: item[1])
-        
+        self._file_list.sort(key=lambda item: item[1])
 
     def _sort_by_name(self):
-        #file_list = self._make_list_of_files()
-        self._file_list.sort(key = lambda item: item[0])
-        
-    
+        self._file_list.sort(key=lambda item: item[0])
+
     # def _make_list_of_files_from_folders(self):
     #
     #     folder_list = [folder.path for folder in os.scandir(self._basepath)]

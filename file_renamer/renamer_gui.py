@@ -121,24 +121,25 @@ class FileRenamerGUI:
             self.fr._basepath = path
             self._browse_button.config(text=path)
             self.fr._file_list = self.fr._make_list_of_files()
+
+            default_prefix = self.fr._get_default_prefix()
+            self.fr._namepattern["prefix"] = default_prefix
+            self._prefix_var.set(default_prefix)
+
+            self.fr._namepattern["startnum"] = "1"
+            self._startnumber_var.set("1")
+
             digits = len(str(len(self.fr._file_list)))
             self.fr._namepattern["digits"] = digits
             self._digits_var.set(digits)
             self._digitnumber_spinbox.config(from_=digits)
-            self._show_originals()
 
-    def _set_default_prefix(self):
-        """
-        Extract and set common prefix from original files if possible, else
-        empty string.
-        """
-        pass
+            self._show_originals()
 
     def _choose_sorting(self):
         """
         Sort internal file list according to choice and update display.
         """
-        
         if self._sortchoice_var.get() == 1:
             self.fr._sort_by_name()
             print("sorted by name")
@@ -152,18 +153,15 @@ class FileRenamerGUI:
         Show or update list of original file names with dates in list box.
         """
         print("Updating")
-        split = os.path.split
-        file_list = [(split(e[0])[-1], e[1]) for e in self.fr._file_list]
         self._filebox_old.delete(0, tk.END)
-        print(file_list)
-        for item in file_list:
+        for item in self.fr._file_list:
             self._filebox_old.insert(tk.END, item)
 
     def _set_startnumber(self, *args):
         current_entry = self._startnumber_var.get()
         if re.match(r"^\d+$", current_entry):
             start = str(int(current_entry))
-            max_num = int(current_entry) + len(self.fr._file_list)
+            max_num = int(current_entry) + len(self.fr._file_list) - 1
             min_digits = len(str(max_num))
         elif current_entry == "":
             start = "1"
@@ -175,15 +173,13 @@ class FileRenamerGUI:
         self.fr._namepattern["startnum"] = start
         self._digitnumber_spinbox.config(from_=min_digits)
         self._digits_var.set(str(min_digits))
-        print(self.fr._namepattern)
 
     def _set_prefix(self, *args):
         self.fr._namepattern["prefix"] = self._prefix_var.get()
-        print(self.fr._namepattern)
 
     def _set_digits(self, *args):
         digits = self._digits_var.get()
-        max_num = int(self.fr._namepattern["startnum"]) + len(self.fr._file_list)
+        max_num = int(self.fr._namepattern["startnum"]) + len(self.fr._file_list) - 1
         min_digits = len(str(max_num))
         if re.match(r"^\d+$", digits) and int(digits) >= min_digits:
             digits = str(int(digits))
@@ -192,7 +188,6 @@ class FileRenamerGUI:
             self._digits_var.set(digits)
             self._digitnumber_spinbox.config(from_=min_digits)
         self.fr._namepattern["digits"] = digits
-        print(self.fr._namepattern)
 
 
 if __name__ == "__main__":
