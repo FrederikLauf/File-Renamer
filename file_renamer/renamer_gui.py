@@ -138,12 +138,13 @@ class FileRenamerGUI:
         """
         Sort internal file list according to choice and update display.
         """
-        if self._sortchoice_var == 1:
-            # ToDo: call sorting method, to be implemented
-            pass
+        
+        if self._sortchoice_var.get() == 1:
+            self.fr._sort_by_name()
+            print("sorted by name")
         else:
-            # ToDo: call sorting method, to be implemented
-            pass
+            self.fr._sort_by_date()
+            print("sorted by date")
         self._show_originals()
 
     def _show_originals(self):
@@ -154,6 +155,7 @@ class FileRenamerGUI:
         split = os.path.split
         file_list = [(split(e[0])[-1], e[1]) for e in self.fr._file_list]
         self._filebox_old.delete(0, tk.END)
+        print(file_list)
         for item in file_list:
             self._filebox_old.insert(tk.END, item)
 

@@ -74,7 +74,17 @@ class FileRenamer:
                     date = self._get_modified_date(file_path)
                 file_list.append((file_path, date))
         return file_list
+    
+    def _sort_by_date(self):
+        #file_list = self._make_list_of_files()
+        self._file_list.sort(key = lambda item: item[1])
+        
 
+    def _sort_by_name(self):
+        #file_list = self._make_list_of_files()
+        self._file_list.sort(key = lambda item: item[0])
+        
+    
     # def _make_list_of_files_from_folders(self):
     #
     #     folder_list = [folder.path for folder in os.scandir(self._basepath)]
