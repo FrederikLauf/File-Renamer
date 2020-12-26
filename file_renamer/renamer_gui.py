@@ -136,6 +136,9 @@ class FileRenamerGUI:
 
             self._show_originals()
 
+            self.fr._new_names = self.fr._make_new_names()
+            self._show_preview()
+
     def _choose_sorting(self):
         """
         Sort internal file list according to choice and update display.
@@ -157,6 +160,12 @@ class FileRenamerGUI:
         for item in self.fr._file_list:
             self._filebox_old.insert(tk.END, item)
 
+    def _show_preview(self):
+        print("Updating new")
+        self._filebox_new.delete(0, tk.END)
+        for item in self.fr._new_names:
+            self._filebox_new.insert(tk.END, item)
+
     def _set_startnumber(self, *args):
         current_entry = self._startnumber_var.get()
         if re.match(r"^\d+$", current_entry):
@@ -174,8 +183,13 @@ class FileRenamerGUI:
         self._digitnumber_spinbox.config(from_=min_digits)
         self._digits_var.set(str(min_digits))
 
+        self.fr._new_names = self.fr._make_new_names()
+        self._show_preview()
+
     def _set_prefix(self, *args):
         self.fr._namepattern["prefix"] = self._prefix_var.get()
+        self.fr._new_names = self.fr._make_new_names()
+        self._show_preview()
 
     def _set_digits(self, *args):
         digits = self._digits_var.get()
@@ -188,6 +202,8 @@ class FileRenamerGUI:
             self._digits_var.set(digits)
             self._digitnumber_spinbox.config(from_=min_digits)
         self.fr._namepattern["digits"] = digits
+        self.fr._new_names = self.fr._make_new_names()
+        self._show_preview()
 
 
 if __name__ == "__main__":

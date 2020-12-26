@@ -17,6 +17,7 @@ class FileRenamer:
         self._basepath = None
         self._image_types = ['jpg', 'JPG', 'png', 'PNG']
         self._file_list = []
+        self._new_names = []
         self._namepattern = {"prefix": "", "digits": "1", "startnum": "1"}
         logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO)
         self.logger = logging.getLogger("FileRenamer")
@@ -91,17 +92,17 @@ class FileRenamer:
     def _sort_by_name(self):
         self._file_list.sort(key=lambda item: item[0])
 
-    # def _make_list_of_files_from_folders(self):
-    #
-    #     folder_list = [folder.path for folder in os.scandir(self._basepath)]
-    #     file_list = []
-    #     for folder in sorted(folder_list):
-    #         folder_files = [file.path for file in os.scandir(folder)]
-    #         for file in sorted(folder_files):
-    #             suffix = file.split('.')[-1]
-    #             if os.path.isfile(file) and suffix in self._image_types:
-    #                 file_list.append(file)
-    #     return file_list
+    def _make_new_names(self):
+        new_names = []
+        prefix = self._namepattern["prefix"]
+        start = self._namepattern["startnum"]
+        digits = self._namepattern["digits"]
+        for idx, old_name in enumerate(self._file_list):
+            pre_zeros = self._make_pre_zeros(int(digits), int(start)+idx)
+            new_name = prefix+pre_zeros+str(int(start)+idx)
+            new_names.append(new_name)
+        return new_names
+
 
     def _move_file_to_new(self):
         pass
