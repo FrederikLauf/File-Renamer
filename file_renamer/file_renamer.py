@@ -11,6 +11,7 @@ import logging
 import re
 import datetime
 
+
 class FileRenamer:
 
     def __init__(self):
@@ -97,12 +98,13 @@ class FileRenamer:
         prefix = self._namepattern["prefix"]
         start = self._namepattern["startnum"]
         digits = self._namepattern["digits"]
-        for idx, old_name in enumerate(self._file_list):
-            pre_zeros = self._make_pre_zeros(int(digits), int(start)+idx)
-            new_name = prefix+pre_zeros+str(int(start)+idx)
+        for idx, item in enumerate(self._file_list):
+            suffix = item[0].split(".")[-1]
+            zeros = self._make_pre_zeros(int(digits), int(start) + idx)
+            number = str(int(start) + idx)
+            new_name = prefix + zeros + number + "." + suffix
             new_names.append(new_name)
         return new_names
-
 
     def _move_file_to_new(self):
         pass
