@@ -14,6 +14,7 @@ class FileRenamerGUI:
         # entry and selection states
         self._sortchoice_var = tk.IntVar()
         self._writechoice_var = tk.IntVar()
+        self._writechoice_var.trace("w", self._set_writechoice)
         self._startnumber_var = tk.StringVar()
         self._startnumber_var.set(self.fr._namepattern["startnum"])
         self._startnumber_var.trace("w", self._set_startnumber)
@@ -26,7 +27,7 @@ class FileRenamerGUI:
         # define elements on window
         # top and bottom
         self._browse_button = tk.Button(window, text='Browse', command=self._browse_folder)
-        self._apply_button = tk.Button(window, text='apply')
+        self._apply_button = tk.Button(window, text='apply', command=self._apply)
         # left area
         self._originals_label = tk.Label(window, text='Original')
         self._scrollbar_old = tk.Scrollbar(window)
@@ -116,6 +117,7 @@ class FileRenamerGUI:
         """
         Let user select a folder and display file content in list box.
         """
+        self._apply_button.config(text="apply")
         path = filedialog.askdirectory()
         if path:
             self.fr._basepath = path
@@ -145,26 +147,25 @@ class FileRenamerGUI:
         """
         if self._sortchoice_var.get() == 1:
             self.fr._sort_by_name()
-            print("sorted by name")
         else:
             self.fr._sort_by_date()
-            print("sorted by date")
         self._show_originals()
+        self.fr._new_names = self.fr._make_new_names()
+        self._show_preview()
 
     def _show_originals(self):
         """
         Show or update list of original file names with dates in list box.
         """
-        print("Updating")
         self._filebox_old.delete(0, tk.END)
         for item in self.fr._file_list:
             self._filebox_old.insert(tk.END, item)
 
     def _show_preview(self):
-        print("Updating new")
         self._filebox_new.delete(0, tk.END)
         for item in self.fr._new_names:
             self._filebox_new.insert(tk.END, item)
+        self._apply_button.config(text="apply")
 
     def _set_startnumber(self, *args):
         current_entry = self._startnumber_var.get()
@@ -204,6 +205,18 @@ class FileRenamerGUI:
         self.fr._namepattern["digits"] = digits
         self.fr._new_names = self.fr._make_new_names()
         self._show_preview()
+
+    def _set_writechoice(self, *args):
+        self._apply_button.config(text="apply")
+
+    def _apply(self):
+        if self._writechoice_var.get() == 1:
+            self.fr._rename_override()
+            self.fr._file_list = self.fr._make_list_of_files()
+            self._show_originals()
+        else:
+            self.fr._rename_copy()
+        self._apply_button.config(text="Success! Close window, or continue browsing and renaming.")
 
 
 if __name__ == "__main__":

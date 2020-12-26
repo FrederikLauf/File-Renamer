@@ -10,6 +10,7 @@ from PIL import Image, ExifTags
 import logging
 import re
 import datetime
+import shutil
 
 
 class FileRenamer:
@@ -23,26 +24,10 @@ class FileRenamer:
         logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO)
         self.logger = logging.getLogger("FileRenamer")
 
-    def _only_folders(self):
-        for item in os.scandir(self._basepath):
-            if os.path.isfile(item.path):
-                return False
-        return True
-
     @staticmethod
     def _make_pre_zeros(digits, idx):
         zeros = (digits - len(str(idx))) * '0'
         return zeros
-
-    # @staticmethod
-    # def _get_photo_shooting_date(image_path):
-    #     img = Image.open(image_path)
-    #     exif_data = img._getexif()
-    #     for k, v in ExifTags.TAGS.items():
-    #         if v == 'DateTimeOriginal':
-    #             day, time = exif_data[k].split(' ')
-    #             day = '.'.join(reversed(day.split(':')))
-    #             return day, time
 
     def _get_default_prefix(self):
         file_names = [item[0] for item in self._file_list]
@@ -106,8 +91,26 @@ class FileRenamer:
             new_names.append(new_name)
         return new_names
 
-    def _move_file_to_new(self):
-        pass
+    def _rename_override(self):
+        for old, new in zip(self._file_list, self._new_names):
+            try:
+                old_path = os.path.join(self._basepath, old[0])
+                new_path = os.path.join(self._basepath, new)
+                os.rename(old_path, new_path)
+            except Exception as err:
+                print("An Error occurred:", err)
+
+    def _rename_copy(self):
+        time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        new_folder = os.path.join(self._basepath, "renamed_files_" + time)
+        os.mkdir(new_folder)
+        for old, new in zip(self._file_list, self._new_names):
+            try:
+                old_path = os.path.join(self._basepath, old[0])
+                new_path = os.path.join(new_folder, new)
+                shutil.copy2(old_path, new_path)
+            except Exception as err:
+                print("An Error occurred:", err)
 
 
 if __name__ == "__main__":
