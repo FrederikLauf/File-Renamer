@@ -9,7 +9,7 @@ import os
 from PIL import Image, ExifTags
 import logging
 import re
-
+import datetime
 
 class FileRenamer:
 
@@ -64,9 +64,9 @@ class FileRenamer:
 
     @staticmethod
     def _get_modified_date(file_path):
-        seconds = str(os.stat(file_path).st_mtime)
-        # ToDo: convert seconds since modification to date
-        return seconds
+        mtime = os.stat(file_path).st_mtime
+        timestamp_str = datetime.datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
+        return timestamp_str
 
     def _make_list_of_files(self):
 
