@@ -1,7 +1,7 @@
+import re
 import tkinter as tk
 from tkinter import filedialog
-import os
-import re
+
 from file_renamer import FileRenamer
 
 
@@ -46,13 +46,13 @@ class FileRenamerGUI:
         self._filebox_new = tk.Listbox(window, yscrollcommand=self._scrollbar_new.set)
         self._scrollbar_new.config(command=self._filebox_new.yview)
         self._radio_override = tk.Radiobutton(window, text='override', variable=self._writechoice_var, value=1)
-        self._radio_override.select()
         self._radio_copy = tk.Radiobutton(window, text='make copy', variable=self._writechoice_var, value=2)
+        self._radio_copy.select()
         # middle area
         self._format_label = tk.Label(window, text='Format')
         self._prefix_label = tk.Label(window, text='Prefix:')
         self._prefix_entry = tk.Entry(window, textvariable=self._prefix_var)
-        self._startnumber_label = tk.Label(window, text='Start with:')
+        self._startnumber_label = tk.Label(window, text='Start:')
         self._startnumber_entry = tk.Entry(window, textvariable=self._startnumber_var)
         self._digitnumber_label = tk.Label(window, text='Digits:')
         self._digitnumber_spinbox = tk.Spinbox(window, from_=self.fr._namepattern["digits"], to=9,
@@ -67,49 +67,50 @@ class FileRenamerGUI:
         self._window.title('File Renamer')
         self._window.config(bg='black')
         self._window.attributes("-alpha", 0.85)
-        self._window.geometry('800x510')
+        self._window.geometry('760x510')
         # left area
-        self._originals_label.config(font='Helvetica 12 bold', bg='grey', activebackground='grey')
+        self._originals_label.config(font='Helvetica 12 bold', bg='grey')
         self._originals_label.place(x=10, y=50, width=220, height=50)
         self._scrollbar_old.place(x=210, y=110, height=310)
         self._filebox_old.place(x=10, y=110, width=200, height=310)
-        self._radio_datesort.config(bg='black', activebackground='black',
-                                    fg='white', selectcolor='black', relief=tk.RAISED)
-        self._radio_namesort.config(bg='black', activebackground='black',
-                                    fg='white', selectcolor='black', relief=tk.RAISED)
+        self._radio_datesort.config(font='Calibri 10', bg='black', fg='white',
+                                    selectcolor='black', relief=tk.RAISED)
+        self._radio_namesort.config(font='Calibri 10', bg='black', fg='white',
+                                    selectcolor='black', relief=tk.RAISED)
         self._radio_namesort.place(x=10, y=430, width=110, height=30)
         self._radio_datesort.place(x=120, y=430, width=110, height=30)
         # right area
-        self._preview_label.config(font='Helvetica 12 bold', bg='grey', activebackground='grey')
-        self._preview_label.place(x=570, y=50, width=220, height=50)
-        self._scrollbar_new.place(x=770, y=110, height=310)
-        self._filebox_new.place(x=570, y=110, width=200, height=310)
-        self._radio_override.config(bg='black', activebackground='black',
-                                    fg='white', selectcolor='black', relief=tk.RAISED)
-        self._radio_copy.config(bg='black', activebackground='black',
-                                fg='white', selectcolor='black', relief=tk.RAISED)
-        self._radio_override.place(x=570, y=430, width=110, height=30)
-        self._radio_copy.place(x=680, y=430, width=110, height=30)
+        x0 = 530
+        self._preview_label.config(font='Helvetica 12 bold', bg='grey')
+        self._preview_label.place(x=x0, y=50, width=220, height=50)
+        self._scrollbar_new.place(x=x0+200, y=110, height=310)
+        self._filebox_new.place(x=x0, y=110, width=200, height=310)
+        self._radio_override.config(font='Calibri 10', bg='black', fg='white', selectcolor='black', relief=tk.RAISED)
+        self._radio_copy.config(font='Calibri 10', bg='black', fg='white', selectcolor='black', relief=tk.RAISED)
+        self._radio_override.place(x=x0+110, y=430, width=110, height=30)
+        self._radio_copy.place(x=x0, y=430, width=110, height=30)
         # middle area
-        self._format_label.config(font='Helvetica 12 bold', bg='grey', activebackground='grey')
-        self._format_label.place(x=300, y=50, width=220, height=50)
-        self._prefix_label.config(font='Helvetica 12', bg='black', activebackground='black', fg='white')
-        self._prefix_label.place(x=300, y=200)
+        x0 = 270
+        y1 = 160
+        self._format_label.config(font='Helvetica 12 bold', bg='grey')
+        self._format_label.place(x=x0, y=50, width=220, height=50)
+        self._prefix_label.config(font='Helvetica 12', bg='black', fg='white')
+        self._prefix_label.place(x=x0, y=y1)
         self._prefix_entry.config(font='Helvetica 12')
-        self._prefix_entry.place(x=375, y=200, width=150, height=20)
-        self._startnumber_label.config(font='Helvetica 12', bg='black', activebackground='black', fg='white')
-        self._startnumber_label.place(x=300, y=240)
+        self._prefix_entry.place(x=x0+75, y=y1, width=140, height=20)
+        self._startnumber_label.config(font='Helvetica 12', bg='black', fg='white')
+        self._startnumber_label.place(x=x0, y=y1+40)
         self._startnumber_entry.config(font='Helvetica 12')
-        self._startnumber_entry.place(x=375, y=240, width=150, height=20)
-        self._digitnumber_label.config(font='Helvetica 12', bg='black', activebackground='black', fg='white')
-        self._digitnumber_label.place(x=300, y=280)
+        self._startnumber_entry.place(x=x0+75, y=y1+40, width=140, height=20)
+        self._digitnumber_label.config(font='Helvetica 12', bg='black', fg='white')
+        self._digitnumber_label.place(x=x0, y=y1+2*40)
         self._digitnumber_spinbox.config(font='Helvetica 12')
-        self._digitnumber_spinbox.place(x=375, y=280, width=150, height=20)
+        self._digitnumber_spinbox.place(x=x0+75, y=y1+2*40, width=140, height=20)
         # top and bottom
         self._browse_button.config(font='Helvetica 11', bg='orange', activebackground='orange')
         self._apply_button.config(font='Helvetica 12 bold', bg='green', activebackground='green')
-        self._browse_button.place(x=10, y=10, width=780, height=30)
-        self._apply_button.place(x=10, y=470, width=780, height=30)
+        self._browse_button.place(x=10, y=10, width=740, height=30)
+        self._apply_button.place(x=10, y=470, width=740, height=30)
 
     # -------methods invoked by GUI actions------------------------------------
 

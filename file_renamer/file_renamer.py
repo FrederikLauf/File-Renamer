@@ -5,12 +5,13 @@ Created on Wed Jun  3 21:38:10 2020
 @author: Frederik
 """
 
-import os
-from PIL import Image, ExifTags
-import logging
-import re
 import datetime
+import logging
+import os
+import re
 import shutil
+
+from PIL import Image, ExifTags
 
 
 class FileRenamer:
