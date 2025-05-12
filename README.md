@@ -4,7 +4,7 @@ The module `file_renamer` contains the class `FileRenamer` which stores a file l
 
 # File Renamer GUI
 
-The File Renamer GUI is invoked by executing renamer_gui.py.
+The File Renamer GUI is invoked by executing file_renamer_gui.py.
 
 # Features and use cases
 
