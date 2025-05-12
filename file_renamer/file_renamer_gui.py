@@ -1,16 +1,13 @@
-import re
-import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog
-
-import file_renamer
 import datetime
-import logging
 import os
 import re
 import shutil
 
-import time
+import file_renamer
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import ttk
+
 
 class FileRenamerGUI:
 
@@ -164,13 +161,13 @@ class FileRenamerGUI:
         if path:
             self.fr._basepath = path
             self._browse_button.config(text=path)
-            self.fr._make_list_of_files()
+            self.fr._make_file_list()
             self.fr._sort_by_name()
             self._progress_bar.config(maximum=len(self.fr._file_list))
             self._progress_bar.config(value=0)
             digits = len(str(len(self.fr._file_list)))
             self.fr._namepattern["digits"] = digits
-            self._digits_var.set(digits)
+            self._digits_var.set(str(digits))
             self._digitnumber_spinbox.config(from_=digits)
             self._show_originals()
             self.fr._make_new_names()
@@ -211,15 +208,18 @@ class FileRenamerGUI:
 
     def _startnumber_entered(self, *args):
         current_entry = self._startnumber_var.get()
+        print("current entry " + current_entry)
         if re.match(r"^\d+$", current_entry):
-            start = str(int(current_entry))
-            max_num = int(current_entry) + len(self.fr._file_list) - 1
+            start = int(current_entry)
+            print("start " + str(start))
+            print("len(self.fr._file_list) " + str(len(self.fr._file_list)))
+            max_num = start + len(self.fr._file_list) - 1
             min_digits = len(str(max_num))
         elif current_entry == "":
-            start = "1"
+            start = 1
             min_digits = len(str(len(self.fr._file_list)))
         else:
-            start = "1"
+            start = 1
             self._startnumber_var.set("1")
             min_digits = len(str(len(self.fr._file_list)))
         self.fr._namepattern["startnum"] = start
@@ -231,13 +231,13 @@ class FileRenamerGUI:
 
     def _digits_selected(self, *args):
         digits = self._digits_var.get()
-        max_num = int(self.fr._namepattern["startnum"]) + len(self.fr._file_list) - 1
+        max_num = self.fr._namepattern["startnum"] + len(self.fr._file_list) - 1
         min_digits = len(str(max_num))
         if re.match(r"^\d+$", digits) and int(digits) >= min_digits:
-            digits = str(int(digits))
+            digits = int(digits)
         else:
-            digits = str(min_digits)
-            self._digits_var.set(digits)
+            digits = min_digits
+            self._digits_var.set(str(digits))
             self._digitnumber_spinbox.config(from_=min_digits)
         self.fr._namepattern["digits"] = digits
         self.fr._make_new_names()

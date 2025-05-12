@@ -12,7 +12,7 @@ if __name__ == "__main__":
     
     fr = FileRenamer()
     fr._basepath = r"unittest_data/unittest_data_1"
-    fr._make_list_of_files()
+    fr._make_file_list()
     fr._sort_by_name()
     print("_sort_by_name")
     assert fr._file_list == result_name_sort
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     fr = FileRenamer()
     fr._basepath = r"unittest_data/unittest_data_2"
     fr._time_offsets = [{'identifier': 'IMG', 'seconds': 117}]
-    fr._make_list_of_files()
+    fr._make_file_list()
     fr._sort_by_name()
     print("_sort_by_name")
     for item in fr._file_list:
