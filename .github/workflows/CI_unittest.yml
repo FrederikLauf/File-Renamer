@@ -1,0 +1,11 @@
+---
+name: Unittest
+run-name: sorting methods unittest
+on: [push]
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python3 -m pip install Pillow
+      - run: python3 file_renamer/file_renamer_unittest.py
+...
