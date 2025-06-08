@@ -6,6 +6,7 @@ jobs:
   unittest:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - run: python3 -m pip install Pillow
       - run: python3 file_renamer/file_renamer_unittest.py
 ...
