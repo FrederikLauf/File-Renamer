@@ -9,6 +9,7 @@ The File Renamer GUI is invoked by executing file_renamer_gui.py.
 # Features and use cases
 
 In the following, all available sortings and options are described. Use cases concerning the creation of files by performing photography are given.
+*Remark: The name and extension of a filename are defined like <filename> = <name>.<extension> such that <name> does not contain any dots. The motivation for this definition is that for example 'abc.jpg' and 'abc.jpg.xmp' should be considered to share the same name.*
 
 ## Sort by name
 
@@ -26,7 +27,7 @@ The files are sorted by their "modified date", also known as "mtime". (NB: The u
 
 Files with the same name (disregarding the extension) are grouped together and the resulting groups are ordered externally by the dates of their respective oldest members.
 
-**Use case:** The photos are taken with two cameras in a "jpeg+RAW" format. The saving of a raw file can take a few seconds during which the other camera can take another picture. However, the jpg and RAW files of the same photo should not be separated when sorting by date.
+**Use case:** The photos are taken with two cameras in a "jpeg+RAW" format. The saving of a raw file can take a few seconds during which the other camera can take another picture. However, the jpg and RAW files of the same photo should not be separated when sorting by date. Furthermore, if the photos are developed and edited by some software creating associated files with another extension (e.g. .NEF.xmp), also these new files should be sorted together with the original images.
 
 ## Time offset
 

@@ -86,7 +86,7 @@ class FileRenamer:
                 new_name = prefix + zeros + number
                 previous_new_name = new_name
             previous_name = current_name
-            self._new_names.append(new_name + "." + suffix)
+            self._new_names.append(new_name + '.' + suffix)
 
 
     def _rename_copy(self):
@@ -105,14 +105,14 @@ class FileRenamer:
 #--------------utility functions-----------------------------------------------
 
 def _filename_name(filename):
-    return '.'.join(filename.split('.')[:-1])
+    return '.'.join(filename.split('.')[0])
 
 def _filename_extension(filename):
-    return filename.split('.')[-1]
+    return '.'.join(filename.split('.')[1:])
 
 def _filename_name_and_extension(filename):
-    *name, ext = filename.split('.')
-    return '.'.join(name), ext
+    name, *ext = filename.split('.')
+    return name, '.'.join(ext)
 
 def _get_pre_zeros(digits, idx):
     return (digits - len(str(idx))) * '0'
