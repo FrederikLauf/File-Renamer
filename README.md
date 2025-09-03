@@ -9,7 +9,8 @@ The File Renamer GUI is invoked by executing file_renamer_gui.py.
 # Features and use cases
 
 In the following, all available sortings and options are described. Use cases concerning the creation of files by performing photography are given.
-*Remark: The name and extension of a filename are defined like <filename> = <name>.<extension> such that <name> does not contain any dots. The motivation for this definition is that for example 'abc.jpg' and 'abc.jpg.xmp' should be considered to share the same name.*
+
+*Remark: The name and extension of a filename are defined like `<filename> = <name>.<extension>` such that `<name>` does not contain any dots. The motivation for this definition is that for example 'abc.jpg' and 'abc.jpg.xmp' should be considered to share the same name.*
 
 ## Sort by name
 
