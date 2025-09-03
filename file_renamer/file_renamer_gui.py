@@ -163,15 +163,26 @@ class FileRenamerGUI:
             self._browse_button.config(text=path)
             self.fr._make_file_list()
             self.fr._sort_by_name()
+            self._show_originals()
             self._progress_bar.config(maximum=len(self.fr._file_list))
             self._progress_bar.config(value=0)
-            digits = len(str(len(self.fr._file_list)))
+            digits, _ = self._get_current_min_digits_and_max_counter()
             self.fr._namepattern["digits"] = digits
-            self._digits_var.set(str(digits))
             self._digitnumber_spinbox.config(from_=digits)
-            self._show_originals()
-            self.fr._make_new_names()
-            self._show_preview()
+            self._digits_var.set(str(digits))  # callback to _digits_selected
+
+    def _get_current_min_digits_and_max_counter(self):
+        checked = self._homonymity_var.get()
+        if checked == 1:
+            amount = len(self.fr._get_homonymity_groups())
+            digits = len(str(amount))
+        elif checked == 2:
+            amount = len(self.fr._file_list)
+            digits = len(str(amount))
+        else:
+            amount = 0
+            digits = 1
+        return digits, amount
 
     def _sorting_radio_selected(self):
         if self._sortchoice_var.get() == 1:
@@ -189,15 +200,16 @@ class FileRenamerGUI:
         current_entry_identifier = self._timeoffset_identifier_var.get()
         if current_entry_identifier == '':
             current_entry_identifier = None
-        if re.match(r"^-?\d+$", current_entry_seconds):
+        if re.match(r"^-?\d+$", current_entry_seconds):  # positive or negative integer
             seconds = int(current_entry_seconds)
-        elif current_entry_seconds == '-':
+        elif current_entry_seconds == '-':  # started typing negative integer
             seconds = 0
-        elif current_entry_seconds == "":
+        elif current_entry_seconds == "":  # empty means 0
             seconds = 0
-        else:
+        else:  # anything else converts to 0
             seconds = 0
-            self._timeoffset_seconds_var.set("0")
+            self._timeoffset_seconds_var.set("0")  # callback to _timeoffset_entered
+            return
         self.fr._time_offsets = [{'identifier': current_entry_identifier, 'seconds': seconds}]
         self._sorting_radio_selected()
 
@@ -208,40 +220,31 @@ class FileRenamerGUI:
 
     def _startnumber_entered(self, *args):
         current_entry = self._startnumber_var.get()
-        print("current entry " + current_entry)
         if re.match(r"^\d+$", current_entry):
             start = int(current_entry)
-            print("start " + str(start))
-            print("len(self.fr._file_list) " + str(len(self.fr._file_list)))
-            max_num = start + len(self.fr._file_list) - 1
-            min_digits = len(str(max_num))
-        elif current_entry == "":
+        elif current_entry == "":  # empty means 1
             start = 1
-            min_digits = len(str(len(self.fr._file_list)))
-        else:
-            start = 1
-            self._startnumber_var.set("1")
-            min_digits = len(str(len(self.fr._file_list)))
+        else:  # anything else converts to 1
+            self._startnumber_var.set("1")  # callback to _startnumber_entered
+            return
+        _, amount = self._get_current_min_digits_and_max_counter()
+        max_num = start + amount - 1
+        min_digits = len(str(max_num))
         self.fr._namepattern["startnum"] = start
         self._digitnumber_spinbox.config(from_=min_digits)
-        self._digits_var.set(str(min_digits))
-
-        self.fr._make_new_names()
-        self._show_preview()
+        self._digits_var.set(str(min_digits))  # callback to _digits_selected
 
     def _digits_selected(self, *args):
         digits = self._digits_var.get()
-        max_num = self.fr._namepattern["startnum"] + len(self.fr._file_list) - 1
-        min_digits = len(str(max_num))
+        min_digits, _ = self._get_current_min_digits_and_max_counter()
         if re.match(r"^\d+$", digits) and int(digits) >= min_digits:
             digits = int(digits)
+            self.fr._namepattern["digits"] = digits
+            self.fr._make_new_names()
+            self._show_preview()
         else:
-            digits = min_digits
+            digits = self.fr._namepattern["digits"]
             self._digits_var.set(str(digits))
-            self._digitnumber_spinbox.config(from_=min_digits)
-        self.fr._namepattern["digits"] = digits
-        self.fr._make_new_names()
-        self._show_preview()
 
     def _homonymity_radio_selected(self):
         checked = self._homonymity_var.get()
@@ -249,8 +252,9 @@ class FileRenamerGUI:
             self.fr._preserve_homonymity = True
         elif checked == 2:
             self.fr._preserve_homonymity = False
-        self.fr._make_new_names()
-        self._show_preview()
+        digits, _ = self._get_current_min_digits_and_max_counter()
+        self._digitnumber_spinbox.config(from_=digits)
+        self._digits_var.set(str(digits))  # callback to _digits_selected
 
     def _show_originals(self):
         self._filebox_originals.delete(0, tk.END)
