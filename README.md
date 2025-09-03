@@ -19,7 +19,7 @@ The files are sorted alphabetically by their name including extension.
 
 ## Sort by date
 
-The files are sorted by their "modified date", also known as "mtime". (NB: The user is responsible for controlling the mtime of their files. The standard behaviour of file copying methods on different operationg systems has to be considered. For a photo file on Windows, the mtime will usually stay at the time when it was taken/saved in the camera. An option to use the EXIF time if available will be added in the future.)
+The files are sorted by their "modified date", also known as "mtime". (NB: The user is responsible for controlling the mtime of their files. The standard behaviour of file copying methods on different operationg systems has to be considered. For a photo file on Windows, the mtime will usually stay at the time when it was taken/saved in the camera. An option to use the EXIF time if available may be added in the future.)
 
 **Use case:** The photos are taken with two different cameras and should be merged in chronological order.
 
