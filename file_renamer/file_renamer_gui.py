@@ -20,22 +20,31 @@ class FileRenamerGUI:
 
         # window variables
         self._sortchoice_var = tk.IntVar()
+        self._sortchoice_var.set(1)
+        self._sortchoice_var.trace("w", self._sorting_radio_selected)        
+        
         self._timeoffset_identifier_var = tk.StringVar()
         self._timeoffset_identifier_var.trace("w", self._timeoffset_entered)
+        
         self._timeoffset_seconds_var = tk.StringVar()
         self._timeoffset_seconds_var.trace("w", self._timeoffset_entered)
-        self._writechoice_var = tk.IntVar()
-        self._writechoice_var.trace("w", self._set_writechoice)
+        
         self._startnumber_var = tk.StringVar()
         self._startnumber_var.set(self.fr._namepattern["startnum"])
         self._startnumber_var.trace("w", self._startnumber_entered)
+        
         self._prefix_var = tk.StringVar()
         self._prefix_var.set(self.fr._namepattern["prefix"])
         self._prefix_var.trace("w", self._prefix_entered)
+        
         self._digits_var = tk.StringVar()
         self._digits_var.set(self.fr._namepattern["digits"])
         self._digits_var.trace("w", self._digits_selected)
+        
         self._homonymity_var = tk.IntVar()
+        self._homonymity_var.set(1 if self.fr._preserve_homonymity is True else 2)
+        self._homonymity_var.trace("w", self._homonymity_radio_selected)
+        
         self._progress_var = tk.IntVar()
 
         # define elements on window
@@ -47,13 +56,9 @@ class FileRenamerGUI:
         self._scrollbar_originals = tk.Scrollbar(window)
         self._filebox_originals = tk.Listbox(window, yscrollcommand=self._scrollbar_originals.set)
         self._scrollbar_originals.config(command=self._filebox_originals.yview)
-        self._radio_namesort = tk.Radiobutton(window, text='sort by name',
-            variable=self._sortchoice_var, value=1, command=self._sorting_radio_selected)
-        self._radio_namesort.select()
-        self._radio_datesort = tk.Radiobutton(window, text='sort by date',
-            variable=self._sortchoice_var, value=2, command=self._sorting_radio_selected)
-        self._radio_homonymdatesort = tk.Radiobutton(window, text='sort by homonymity and date',
-            variable=self._sortchoice_var, value=3, command=self._sorting_radio_selected)
+        self._radio_namesort = tk.Radiobutton(window, text='sort by name', variable=self._sortchoice_var, value=1)
+        self._radio_datesort = tk.Radiobutton(window, text='sort by date', variable=self._sortchoice_var, value=2)
+        self._radio_homonymdatesort = tk.Radiobutton(window, text='sort by homonymity and date', variable=self._sortchoice_var, value=3)
         self._timeoffset_identifier_label = tk.Label(window, text='time offset if name contains')
         self._timeoffset_identifier_entry = tk.Entry(window, textvariable=self._timeoffset_identifier_var)
         self._timeoffset_seconds_label = tk.Label(window, text='time offset in seconds')
@@ -63,8 +68,6 @@ class FileRenamerGUI:
         self._scrollbar_preview = tk.Scrollbar(window)
         self._filebox_preview = tk.Listbox(window, yscrollcommand=self._scrollbar_preview.set)
         self._scrollbar_preview.config(command=self._filebox_preview.yview)
-        self._radio_copy = tk.Radiobutton(window, text='make copy', variable=self._writechoice_var, value=1)
-        self._radio_copy.select()
         self._progress_bar = ttk.Progressbar(window, orient="horizontal", mode="determinate")
         # middle area
         self._format_label = tk.Label(window, text='Format')
@@ -73,14 +76,10 @@ class FileRenamerGUI:
         self._startnumber_label = tk.Label(window, text='Start:')
         self._startnumber_entry = tk.Entry(window, textvariable=self._startnumber_var)
         self._digitnumber_label = tk.Label(window, text='Digits:')
-        self._digitnumber_spinbox = tk.Spinbox(window, from_=self.fr._namepattern["digits"], to=9,
-            textvariable=self._digits_var)
+        self._digitnumber_spinbox = tk.Spinbox(window, from_=self.fr._namepattern["digits"], to=9, textvariable=self._digits_var)
         self._homonymity_label = tk.Label(window, text='Preserve homonymity')
-        self._radio_homonymity_yes = tk.Radiobutton(window, text='preserve homonymity',
-            variable=self._homonymity_var, value=1, command=self._homonymity_radio_selected)
-        self._radio_homonymity_no = tk.Radiobutton(window, text='strictly increase',
-            variable=self._homonymity_var, value=2, command=self._homonymity_radio_selected)
-        self._radio_homonymity_yes.select()
+        self._radio_homonymity_yes = tk.Radiobutton(window, text='preserve homonymity', variable=self._homonymity_var, value=1)
+        self._radio_homonymity_no = tk.Radiobutton(window, text='strictly increase', variable=self._homonymity_var, value=2)
 
         # configure style and place elements on window
         self._make_layout()
@@ -119,8 +118,6 @@ class FileRenamerGUI:
         self._label_preview.place(x=x0, y=50, width=220, height=50)
         self._scrollbar_preview.place(x=x0 + 200, y=110, height=310)
         self._filebox_preview.place(x=x0, y=110, width=200, height=310)
-        self._radio_copy.config(font='Calibri 10', bg='black', fg='white', selectcolor='black', relief=tk.RAISED)
-        self._radio_copy.place(x=x0, y=430, width=220, height=30)
         self._progress_bar.place(x=x0, y=460, width=220, height=30)
         # middle area
         x0 = 270
@@ -155,9 +152,13 @@ class FileRenamerGUI:
         self._apply_button.place(x=10, y=500, width=740, height=30)
 
     # -------methods invoked by GUI actions------------------------------------
+    def _get_folder_directory(self):
+        path = filedialog.askdirectory()
+        return path
 
     def _browse_button_clicked(self):
-        path = filedialog.askdirectory()
+        path = self._get_folder_directory()
+        print(path)
         if path:
             self.fr._basepath = path
             self._browse_button.config(text=path)
@@ -166,25 +167,27 @@ class FileRenamerGUI:
             self._show_originals()
             self._progress_bar.config(maximum=len(self.fr._file_list))
             self._progress_bar.config(value=0)
-            digits, _ = self._get_current_min_digits_and_max_counter()
+            digits = self._get_current_min_digits()
             self.fr._namepattern["digits"] = digits
             self._digitnumber_spinbox.config(from_=digits)
             self._digits_var.set(str(digits))  # callback to _digits_selected
 
-    def _get_current_min_digits_and_max_counter(self):
+    def _get_current_min_digits(self):
         checked = self._homonymity_var.get()
         if checked == 1:
             amount = len(self.fr._get_homonymity_groups())
-            digits = len(str(amount))
         elif checked == 2:
             amount = len(self.fr._file_list)
-            digits = len(str(amount))
         else:
             amount = 0
             digits = 1
-        return digits, amount
+        start = self._startnumber_var.get()
+        start = int(start) if start != '' else 1
+        max_num = start + amount - 1
+        digits = len(str(max_num))
+        return digits
 
-    def _sorting_radio_selected(self):
+    def _sorting_radio_selected(self, *args):
         if self._sortchoice_var.get() == 1:
             self.fr._sort_by_name()
         elif self._sortchoice_var.get() == 2:
@@ -223,20 +226,21 @@ class FileRenamerGUI:
         if re.match(r"^\d+$", current_entry):
             start = int(current_entry)
         elif current_entry == "":  # empty means 1
+            # self._startnumber_var.set("1")
             start = 1
         else:  # anything else converts to 1
             self._startnumber_var.set("1")  # callback to _startnumber_entered
             return
-        _, amount = self._get_current_min_digits_and_max_counter()
-        max_num = start + amount - 1
-        min_digits = len(str(max_num))
+        min_digits = self._get_current_min_digits()
+        # max_num = start + amount - 1
+        # min_digits = len(str(max_num))
         self.fr._namepattern["startnum"] = start
         self._digitnumber_spinbox.config(from_=min_digits)
         self._digits_var.set(str(min_digits))  # callback to _digits_selected
 
     def _digits_selected(self, *args):
         digits = self._digits_var.get()
-        min_digits, _ = self._get_current_min_digits_and_max_counter()
+        min_digits = self._get_current_min_digits()
         if re.match(r"^\d+$", digits) and int(digits) >= min_digits:
             digits = int(digits)
             self.fr._namepattern["digits"] = digits
@@ -246,13 +250,13 @@ class FileRenamerGUI:
             digits = self.fr._namepattern["digits"]
             self._digits_var.set(str(digits))
 
-    def _homonymity_radio_selected(self):
+    def _homonymity_radio_selected(self, *args):
         checked = self._homonymity_var.get()
         if checked == 1:
             self.fr._preserve_homonymity = True
         elif checked == 2:
             self.fr._preserve_homonymity = False
-        digits, _ = self._get_current_min_digits_and_max_counter()
+        digits= self._get_current_min_digits()
         self._digitnumber_spinbox.config(from_=digits)
         self._digits_var.set(str(digits))  # callback to _digits_selected
 
@@ -314,4 +318,5 @@ class FileRenamerGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     frg = FileRenamerGUI(root)
+    root.resizable(width=False, height=False)
     root.mainloop()
