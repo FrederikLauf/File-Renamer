@@ -14,7 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 -m pip install Pillow
-      - run: python3 -m pip install tkinter
       - run: python3 -m pip install robotframework      
       - run: robot file_renamer/test/file_renamer_gui_test.robot
 ...
