@@ -1,6 +1,9 @@
-# -*- coding: utf-8 -*-
-
+import os
+import sys
 import unittest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+print(sys.path)
 from file_renamer import FileRenamer
 from unittest_data.unittest_data import FILE_LIST, result_name_sort, result_date_sort, result_homonymity_date_sort
 from unittest_data.unittest_data import FILE_LIST_WITH_OFFSET, result_name_sort_offset, result_date_sort_offset, result_homonymity_date_sort_offset

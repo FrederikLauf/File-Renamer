@@ -3,10 +3,11 @@ import os
 import re
 import shutil
 
-import file_renamer
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
+
+import file_renamer
 
 
 class FileRenamerGUI:
