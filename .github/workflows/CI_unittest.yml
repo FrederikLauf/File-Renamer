@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: apt update
-      - run: apt install -y python3-tk
+      - run: sudo apt update
+      - run: sudo apt install -y python3-tk
       - run: python3 -m pip install Pillow
       - run: python3 -m pip install robotframework      
       - run: robot file_renamer/test/file_renamer_gui_test.robot
