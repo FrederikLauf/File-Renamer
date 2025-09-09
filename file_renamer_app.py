@@ -7,7 +7,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 
-import file_renamer
+from file_renamer.file_renamer import FileRenamer
 
 
 class FileRenamerGUI:
@@ -17,7 +17,7 @@ class FileRenamerGUI:
         Initialisation of window elements and variables
         """
         self._window = window
-        self.fr = file_renamer.FileRenamer()
+        self.fr = FileRenamer()
 
         # window variables
         self._sortchoice_var = tk.IntVar()

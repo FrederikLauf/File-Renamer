@@ -2,20 +2,20 @@ import os
 import re
 import sys
 import time
-import tkinter as tk
 from unittest.mock import MagicMock
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import file_renamer_gui
-from unittest_data.unittest_data import FILE_LIST, result_name_sort, result_date_sort, result_homonymity_date_sort
+import tkinter as tk
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import file_renamer_app
+from test_data.unit_test_data import FILE_LIST, result_name_sort, result_date_sort, result_homonymity_date_sort
 
 
 class FileRenamerGuiTestLibrary:
 
     def __init__(self):
         self.root = tk.Tk()
-        self.frg = file_renamer_gui.FileRenamerGUI(self.root)
+        self.frg = file_renamer_app.FileRenamerGUI(self.root)
         self.root.withdraw()
 
     def select_test_image_folder(self):
