@@ -18,7 +18,7 @@ jobs:
       - run: sudo apt install xvfb
       - run: python3 -m pip install Pillow
       - run: python3 -m pip install robotframework      
-      - run: xvfb-run robot file_renamer/test/file_renamer_gui_test.robot
+      - run: xvfb-run robot test/file_renamer_gui_test.robot
       - uses: actions/upload-artifact@v4
         with:
           path: |
