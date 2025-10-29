@@ -14,12 +14,12 @@ class FileRenamerGUI:
 
     def __init__(self, window):
         """
-        Initialisation of window elements and variables
+        Initialisation of variables and window elements
         """
         self._window = window
         self.fr = FileRenamer()
 
-        # window variables
+        # variables
         self._sortchoice_var = tk.IntVar()
         self._sortchoice_var.set(1)
         self._sortchoice_var.trace("w", self._sorting_radio_selected)        
@@ -47,119 +47,109 @@ class FileRenamerGUI:
         self._homonymity_var.trace("w", self._homonymity_radio_selected)
         
         self._progress_var = tk.IntVar()
+        
+        # window elements
+        self._make_window_elements()
 
-        # define elements on window
-        # top and bottom
-        self._browse_button = tk.Button(window, text='browse', command=self._browse_button_clicked)
-        self._apply_button = tk.Button(window, text='apply', command=self._apply_button_clicked)
-        # left area
-        self._label_originals = tk.Label(window, text='original')
-        self._scrollbar_originals = tk.Scrollbar(window)
-        self._filebox_originals = tk.Listbox(window, yscrollcommand=self._scrollbar_originals.set)
-        self._scrollbar_originals.config(command=self._filebox_originals.yview)
-        self._radio_namesort = tk.Radiobutton(window, text='sort by name', variable=self._sortchoice_var, value=1)
-        self._radio_datesort = tk.Radiobutton(window, text='sort by date', variable=self._sortchoice_var, value=2)
-        self._radio_homonymdatesort = tk.Radiobutton(window, text='sort by homonymity and date', variable=self._sortchoice_var, value=3)
-        self._timeoffset_identifier_label = tk.Label(window, text='time offset if name contains')
-        self._timeoffset_identifier_entry = tk.Entry(window, textvariable=self._timeoffset_identifier_var)
-        self._timeoffset_seconds_label = tk.Label(window, text='time offset in seconds')
-        self._timeoffset_seconds_entry = tk.Entry(window, textvariable=self._timeoffset_seconds_var)
-        # right area
-        self._label_preview = tk.Label(window, text='Preview')
-        self._scrollbar_preview = tk.Scrollbar(window)
-        self._filebox_preview = tk.Listbox(window, yscrollcommand=self._scrollbar_preview.set)
-        self._scrollbar_preview.config(command=self._filebox_preview.yview)
-        self._progress_bar = ttk.Progressbar(window, orient="horizontal", mode="determinate")
-        # middle area
-        self._format_label = tk.Label(window, text='Format')
-        self._prefix_label = tk.Label(window, text='Prefix:')
-        self._prefix_entry = tk.Entry(window, textvariable=self._prefix_var)
-        self._startnumber_label = tk.Label(window, text='Start:')
-        self._startnumber_entry = tk.Entry(window, textvariable=self._startnumber_var)
-        self._digitnumber_label = tk.Label(window, text='Digits:')
-        self._digitnumber_spinbox = tk.Spinbox(window, from_=self.fr._namepattern["digits"], to=9, textvariable=self._digits_var)
-        self._homonymity_label = tk.Label(window, text='Preserve homonymity')
-        self._radio_homonymity_yes = tk.Radiobutton(window, text='preserve homonymity', variable=self._homonymity_var, value=1)
-        self._radio_homonymity_no = tk.Radiobutton(window, text='strictly increase', variable=self._homonymity_var, value=2)
-
-        # configure style and place elements on window
-        self._make_layout()
-
-    def _make_layout(self):
+    def _make_window_elements(self):
         """
         Configure style and location of window elements
         """
         self._window.title('File Renamer')
-        self._window.config(bg='black')
-        # self._window.attributes("-alpha", 0.85)
-        self._window.geometry('760x540')
-        # left area
-        self._label_originals.config(font='Helvetica 12 bold', bg='grey')
-        self._label_originals.place(x=10, y=50, width=220, height=50)
-        self._scrollbar_originals.place(x=210, y=110, height=310)
-        self._filebox_originals.place(x=10, y=110, width=200, height=310)
-        self._radio_datesort.config(font='Calibri 10', bg='black', fg='white',
-                                    selectcolor='black', relief=tk.RAISED)
-        self._radio_namesort.config(font='Calibri 10', bg='black', fg='white',
-                                    selectcolor='black', relief=tk.RAISED)
-        self._radio_homonymdatesort.config(font='Calibri 10', bg='black', fg='white',
-                                    selectcolor='black', relief=tk.RAISED)
-        self._radio_namesort.place(x=10, y=430, width=110, height=30)
-        self._radio_datesort.place(x=120, y=430, width=110, height=30)
-        self._radio_homonymdatesort.place(x=10, y=460, width=220, height=30)
-        self._timeoffset_identifier_label.config(font='Calibri 10', bg='black', fg='white')
-        self._timeoffset_identifier_label.place(x=230, y=430, width=175, height=20)
-        self._timeoffset_identifier_entry.place(x=405, y=430, width=30, height=20)
-        self._timeoffset_seconds_label.config(font='Calibri 10', bg='black', fg='white')
-        self._timeoffset_seconds_label.place(x=230, y=460, width=175, height=20)
-        self._timeoffset_seconds_entry.place(x=405, y=460, width=30, height=20)
-        # right area
-        x0 = 530
-        self._label_preview.config(font='Helvetica 12 bold', bg='grey')
-        self._label_preview.place(x=x0, y=50, width=220, height=50)
-        self._scrollbar_preview.place(x=x0 + 200, y=110, height=310)
-        self._filebox_preview.place(x=x0, y=110, width=200, height=310)
-        self._progress_bar.place(x=x0, y=460, width=220, height=30)
-        # middle area
-        x0 = 270
-        y1 = 160
-        self._format_label.config(font='Helvetica 12 bold', bg='grey')
-        self._format_label.place(x=x0, y=50, width=220, height=50)
-        self._prefix_label.config(font='Helvetica 12', bg='black', fg='white')
-        self._prefix_label.place(x=x0, y=y1)
-        self._prefix_entry.config(font='Helvetica 12')
-        self._prefix_entry.place(x=x0 + 75, y=y1, width=140, height=20)
-        self._startnumber_label.config(font='Helvetica 12', bg='black', fg='white')
-        self._startnumber_label.place(x=x0, y=y1 + 40)
-        self._startnumber_entry.config(font='Helvetica 12')
-        self._startnumber_entry.place(x=x0 + 75, y=y1 + 40, width=140, height=20)
-        self._digitnumber_label.config(font='Helvetica 12', bg='black', fg='white')
-        self._digitnumber_label.place(x=x0, y=y1 + 2 * 40)
-        self._digitnumber_spinbox.config(font='Helvetica 12')
-        self._digitnumber_spinbox.place(x=x0 + 75, y=y1 + 2 * 40, width=140, height=20)
-        # self._homonymity_label.config(font='Helvetica 12', bg='black', fg='white')
-        # self._homonymity_label.place(x=x0, y=y1 + 3 * 40)
-        self._radio_homonymity_yes.config(font='Calibri 10', bg='black', fg='white',
-            selectcolor='black', relief=tk.RAISED)
-        self._radio_homonymity_yes.place(x=x0 + 70, y=y1 + 3 * 40, width=150, height=30)
-        self._radio_homonymity_no.config(font='Calibri 10', bg='black', fg='white',
-            selectcolor='black', relief=tk.RAISED)
-        self._radio_homonymity_no.place(x=x0 + 70, y=y1 + 3 * 40 + 30, width=150, height=30)
 
-        # top and bottom
-        self._browse_button.config(font='Helvetica 11', bg='orange', activebackground='orange')
-        self._apply_button.config(font='Helvetica 12 bold', bg='green', activebackground='green')
-        self._browse_button.place(x=10, y=10, width=740, height=30)
-        self._apply_button.place(x=10, y=500, width=740, height=30)
+        top_frame = tk.Frame(self._window)
+        browse_button_frame = tk.Frame(top_frame)
+        self._browse_button = tk.Button(browse_button_frame, text='browse', command=self._browse_button_clicked)
+        self._browse_button.pack(fill=tk.X)
+        browse_button_frame.pack(fill=tk.X)
+        top_frame.pack(fill=tk.X)
+        
+        middle_frame = tk.Frame()
+        
+        original_frame = tk.Frame(middle_frame)
+        file_box_frame = tk.Frame(original_frame)
+        self._scrollbar_originals = tk.Scrollbar(file_box_frame)
+        self._filebox_originals = tk.Listbox(file_box_frame, yscrollcommand=self._scrollbar_originals.set)
+        self._scrollbar_originals.config(command=self._filebox_originals.yview)
+        self._scrollbar_originals.pack(side='right', fill=tk.Y)
+        self._filebox_originals.pack(side='left', fill=tk.BOTH, expand=True)
+        file_box_frame.pack(fill=tk.BOTH, expand=True)
+        sort_settings_frame = tk.Frame(original_frame)
+        sort_settings_frame_1 = tk.Frame(sort_settings_frame)
+        sort_settings_frame_2 = tk.Frame(sort_settings_frame)
+        sort_settings_frame_3 = tk.Frame(sort_settings_frame)
+        self._radio_namesort = tk.Radiobutton(sort_settings_frame_1, text='sort by name', variable=self._sortchoice_var, value=1)
+        self._radio_datesort = tk.Radiobutton(sort_settings_frame_1, text='sort by date', variable=self._sortchoice_var, value=2)
+        self._radio_namesort.pack(side='left')
+        self._radio_datesort.pack(side='right')
+        self._radio_homonymdatesort = tk.Radiobutton(sort_settings_frame_2, text='sort by homonymity and date', variable=self._sortchoice_var, value=3)
+        self._radio_homonymdatesort.pack()
+        self._timeoffset_seconds_label = tk.Label(sort_settings_frame_3, text='time offset')
+        self._timeoffset_seconds_entry = tk.Entry(sort_settings_frame_3, textvariable=self._timeoffset_seconds_var)
+        self._timeoffset_seconds_label.pack(side='left')
+        self._timeoffset_seconds_entry.pack(side='left')
+        self._timeoffset_identifier_label = tk.Label(sort_settings_frame_3, text='s, if name contains')
+        self._timeoffset_identifier_entry = tk.Entry(sort_settings_frame_3, textvariable=self._timeoffset_identifier_var)
+        self._timeoffset_identifier_label.pack(side='left')
+        self._timeoffset_identifier_entry.pack(side='left')
+        sort_settings_frame_1.pack()
+        sort_settings_frame_2.pack()
+        sort_settings_frame_3.pack()
+        sort_settings_frame.pack()
+        original_frame.pack(side='left', fill=tk.BOTH, expand=True)
 
-    # -------methods invoked by GUI actions------------------------------------
+        preview_frame = tk.Frame(middle_frame)
+        preview_box_frame = tk.Frame(preview_frame)
+        self._scrollbar_preview = tk.Scrollbar(preview_box_frame)
+        self._filebox_preview = tk.Listbox(preview_box_frame, yscrollcommand=self._scrollbar_preview.set)
+        self._scrollbar_preview.config(command=self._filebox_preview.yview)
+        self._scrollbar_preview.pack(side='right', fill=tk.Y)
+        self._filebox_preview.pack(side='left', fill=tk.BOTH, expand=True)
+        preview_box_frame.pack(fill=tk.BOTH, expand=True)
+        format_settings_frame_1 = tk.Frame(preview_frame)
+        format_settings_frame_2 = tk.Frame(preview_frame)
+        format_settings_frame_3 = tk.Frame(preview_frame)
+        self._prefix_label = tk.Label(format_settings_frame_1, text='Prefix:')
+        self._prefix_entry = tk.Entry(format_settings_frame_1, textvariable=self._prefix_var)
+        self._prefix_label.pack(side='left')
+        self._prefix_entry.pack(side='left')
+        self._startnumber_label = tk.Label(format_settings_frame_2, text='Start:')
+        self._startnumber_entry = tk.Entry(format_settings_frame_2, textvariable=self._startnumber_var)
+        self._startnumber_label.pack(side='left')
+        self._startnumber_entry.pack(side='left')
+        self._digitnumber_label = tk.Label(format_settings_frame_2, text='Digits:')
+        self._digitnumber_spinbox = tk.Spinbox(format_settings_frame_2, textvariable=self._digits_var)
+        self._digitnumber_label.pack(side='left')
+        self._digitnumber_spinbox.pack(side='left')
+        self._radio_homonymity_yes = tk.Radiobutton(format_settings_frame_3, text='preserve homonymity', variable=self._homonymity_var, value=1)
+        self._radio_homonymity_no = tk.Radiobutton(format_settings_frame_3, text='strictly increase', variable=self._homonymity_var, value=2)
+        self._radio_homonymity_yes.pack(side='left')
+        self._radio_homonymity_no.pack(side='left')
+        format_settings_frame_1.pack()
+        format_settings_frame_2.pack()
+        format_settings_frame_3.pack()
+        self._progress_bar = ttk.Progressbar(preview_frame, orient="horizontal", mode="determinate")
+        self._progress_bar.pack(side='bottom', fill=tk.X)
+        preview_frame.pack(side='right', fill=tk.BOTH, expand=True)
+        
+        middle_frame.pack(fill=tk.BOTH, expand=True)
+        
+        bottom_frame = tk.Frame()
+        self._apply_button = tk.Button(bottom_frame, text='apply', command=self._apply_button_clicked)
+        self._apply_button.pack(fill=tk.X)
+        bottom_frame.pack(side='bottom', fill=tk.X)
+        
+        self._digitnumber_spinbox.config(from_=self.fr._namepattern["digits"], to=9)
+
+
+    # -------callback and utility methods-------------------------------
+
     def _get_folder_directory(self):
         path = filedialog.askdirectory()
         return path
 
     def _browse_button_clicked(self):
         path = self._get_folder_directory()
-        print(path)
         if path:
             self.fr._basepath = path
             self._browse_button.config(text=path)
@@ -292,7 +282,6 @@ class FileRenamerGUI:
                 shutil.copy2(old_path, new_path)
                 self._progress_bar.config(value=self._progress_var + 1)
                 self._progress_var += 1
-                print("copy " + str(self._progress_var + 1))
             except Exception as err:
                 print("An Error occurred:", err)
             if self._progress_var < len(self.fr._file_list):
@@ -311,7 +300,6 @@ class FileRenamerGUI:
                 new_path = os.path.join(new_folder, new)
                 shutil.copy2(old_path, new_path)
                 self._progress_bar.config(value=i+1)
-                print("copy " + str(i+1))
             except Exception as err:
                 print("An Error occurred:", err)
 
@@ -319,5 +307,4 @@ class FileRenamerGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     frg = FileRenamerGUI(root)
-    root.resizable(width=False, height=False)
     root.mainloop()
