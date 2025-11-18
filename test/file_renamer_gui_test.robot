@@ -1,6 +1,8 @@
 *** Settings ***
 Library    FileRenamerGuiTestLibrary.py
 
+Test Setup    Open File Renamer App
+
 
 *** Test Cases ***
 Original File List Sorting Options
